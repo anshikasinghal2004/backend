@@ -18,7 +18,7 @@ const ClientList = () => {
     const data = await response.json();
     setClients(data);
   };
-  
+
   const handleAddClient = async (client) => {
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -57,10 +57,8 @@ const ClientList = () => {
   };
   return (
     <Container>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Client List
-      </Typography>
-      <ClientForm initialValues={currentClient || { name: '', representative_name: '', designation: '', department: '', email_id: '', mobile_number: '', process_list: '' }} />
+      <Typography variant='h4' component='h1' gutterBottom/>
+      <ClientForm initialValues={currentClient || { name: '', representative_name: '', designation: '', department: '', email_id: '', mobile_number: '', process_list: '' }}  onSubmit={handleSubmit}/>
       <List>
         {clients.map((client) => (
           <ListItem key={client.id}>
@@ -68,10 +66,10 @@ const ClientList = () => {
               primary={client.name}
               secondary={`Email: ${client.email_id} | Mobile: ${client.mobile_number}`} />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label='edit' onClick={() => handleEdit(client)}>
+              <IconButton edge="end" aria-label='edit' onClick={() => handleEdit(client.id)}>
                 <Edit />
               </IconButton>
-              <IconButton edge="end" aria-label='delete' onClick={() => handleDeleteClient(client)}>
+              <IconButton edge="end" aria-label='delete' onClick={() => handleDeleteClient(client.id)}>
                 <Delete />
               </IconButton>
             </ListItemSecondaryAction>
