@@ -1,16 +1,14 @@
 'use client'
-
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { TextField, Button, Grid, Typography, Container } from '@material-ui/core';
-
 const validationSchema = Yup.object({
   name: Yup.string().required('Required'),
   representative_name: Yup.string().required('Required'),
   designation: Yup.string().required('Required'),
   department: Yup.string().required('Required'),
-  email_id: Yup.string().email('Invalid email format').required('Required'),
+  email_id: Yup.string().required('Required'),
   mobile_number: Yup.string().required('Required'),
   process_list: Yup.string().required('Required'),
 });
@@ -18,14 +16,13 @@ const validationSchema = Yup.object({
 const ClientForm = ({ initialValues, onSubmit }) => {
   return (
     <Container>
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Typography variant='h4' component='h1' gutterBottom>
         Client Form
       </Typography>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
-      >
+        onSubmit={onSubmit}>
         {({ isSubmitting }) => (
           <Form>
             <Grid container spacing={3}>
@@ -50,7 +47,7 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <Field item xs={12}
                   name="designation"
                   as={TextField}
                   variant="outlined"
@@ -60,7 +57,7 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <Field item xs={12}
                   name="department"
                   as={TextField}
                   variant="outlined"
@@ -70,7 +67,7 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <Field item xs={12}
                   name="email_id"
                   as={TextField}
                   variant="outlined"
@@ -80,7 +77,7 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <Field item xs={12}
                   name="mobile_number"
                   as={TextField}
                   variant="outlined"
@@ -90,7 +87,7 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Field
+                <Field item xs={12}
                   name="process_list"
                   as={TextField}
                   variant="outlined"
@@ -100,12 +97,11 @@ const ClientForm = ({ initialValues, onSubmit }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  disabled={isSubmitting}
-                >
+                <Button 
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}>
                   Submit
                 </Button>
               </Grid>
@@ -114,7 +110,6 @@ const ClientForm = ({ initialValues, onSubmit }) => {
         )}
       </Formik>
     </Container>
-  );
-};
-
+  )
+}
 export default ClientForm;
