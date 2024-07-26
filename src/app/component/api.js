@@ -1,82 +1,181 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
-import { Container, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Typography } from '@material-ui/core';
-import { Edit, Delete } from '@material-ui/icons';
+import { CssBaseline, makeStyles, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@material-ui/core';
+import { Edit, Delete, Add } from '@material-ui/icons';
+import Header from './Header';
+import Sidebar from './Sidebar';
 import ClientForm from './form1';
 
-const apiEndpoint = 'https://bgv-backend.vitsinco.com/client';
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  toolbar: theme.mixins.toolbar,
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+  },
+  table: {
+    minWidth: 650,
+  },
+  addButton: {
+    alignSelf: 'felx-end',
+  },
+  headerContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+  },
+}));
 
-const ClientList = () => {
+const App = () => {
+  const classes = useStyles();
   const [clients, setClients] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
   const [currentClient, setCurrentClient] = useState(null);
+  const [view, setView] = useState('Dashboard');
+
   useEffect(() => {
-    fetchClients();
-  }, []);
+    if (view === 'Companies') {
+      fetchClients();
+    }
+  }, [view]);
 
   const fetchClients = async () => {
-    const response = await fetch(apiEndpoint);
-    const data = await response.json();
-    setClients(data);
+    const response = await fetch('https://bgv-backend.vitsinco.com/client');
+    if (response.ok) {
+      const data = await response.json();
+      setClients(data);
+    } else {
+      console.error('Failed to fetch clients');
+    }
   };
 
-  const handleAddClient = async (client) => {
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(client),
-    });
-    const newClient = await response.json();
-    setClients([...clients, newClient]);
-  };
-  const handleUpdateClient = async (client) => {
-    const response = await fetch(`${apiEndpoint}/${client.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(client),
-    });
-    const updateClient = await response.json();
-    setClients(clients.map((c) => (c.id === updateClient.id ? updateClient : c)));
-  };
-
-  const handleDeleteClient = async (id) => {
-    await fetch(`${apiEndpoint}/${id}`, { method: 'DELETE' });
-    setClients(clients.filter((c) => c.id !== id));
-  };
-  const handleSubmit = (values, { resetForm }) => {
-    if (currentClient) {
-      handleUpdateClient({ ...currentClient, ...values })
-    }
-    else {
-      handleAddClient(values);
-    }
-    resetForm();
-    setCurrentClient(null);
-  };
   const handleEdit = (client) => {
     setCurrentClient(client);
+    setOpenDialog(true);
   };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setCurrentClient(null);
+  };
+
+  const handleSave = async (updatedClient) => {
+    try {
+      const response = await fetch(`https://bgv-backend.vitsinco.com/client/${currentClient ? currentClient.id : ''}`, {
+        method: currentClient ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedClient),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (currentClient) {
+          setClients((prevClients) =>
+            prevClients.map((client) =>
+              client.id === data.id ? data : client
+            )
+          );
+        } else {
+          setClients((prevClients) => [...prevClients, data]);
+        }
+        handleCloseDialog();
+      } else {
+        console.error('Failed to save client');
+      }
+    } catch (error) {
+      console.error('Error saving client:', error);
+    }
+  };
+
+  const handleMenuClick = (menu) => {
+    setView(menu);
+  };
+
+  const renderContent = () => {
+    switch (view) {
+      case 'Dashboard':
+        return <Typography variant='h4'>Dashboard Page</Typography>;
+      case 'Companies':
+        return (
+          <div>
+            <Typography variant="h4" gutterBottom>
+              Client List
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.addButton}
+              startIcon={<Add />}
+              onClick={() => setOpenDialog(true)}
+            >
+              Add Client
+            </Button>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Candidate Name</TableCell>
+                    <TableCell>Mobile Number</TableCell>
+                    <TableCell>Email ID</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {clients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell>{client.name}</TableCell>
+                      <TableCell>{client.mobile_number}</TableCell>
+                      <TableCell>{client.email_id}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleEdit(client)}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton>
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+              <DialogTitle>{currentClient ? 'Edit Client' : 'Add Client'}</DialogTitle>
+              <DialogContent>
+                <ClientForm initialValues={currentClient || {}} onSubmit={handleSave} />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDialog} color="primary">
+                  Cancel
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+        );
+      case 'Candidate':
+        return <Typography variant='h4'>Candidate page</Typography>;
+      case 'Internal Team':
+        return <Typography variant='h4'>Internal Team Page</Typography>;
+      default:
+        return <Typography variant='h4'>Some error occured</Typography>;
+    }
+  };
+
   return (
-    <Container>
-      <Typography variant='h4' component='h1' gutterBottom/>
-      <ClientForm initialValues={currentClient || { name: '', representative_name: '', designation: '', department: '', email_id: '', mobile_number: '', process_list: '' }}  onSubmit={handleSubmit}/>
-      <List>
-        {clients.map((client) => (
-          <ListItem key={client.id}>
-            <ListItemText
-              primary={client.name}
-              secondary={`Email: ${client.email_id} | Mobile: ${client.mobile_number}`} />
-            <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label='edit' onClick={() => handleEdit(client.id)}>
-                <Edit />
-              </IconButton>
-              <IconButton edge="end" aria-label='delete' onClick={() => handleDeleteClient(client.id)}>
-                <Delete />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+    <div className={classes.root}>
+      <CssBaseline />
+      <Header />
+      <Sidebar onMenuClick={handleMenuClick} />
+      <main className={classes.content}>
+        <div className={classes.toolbar} />
+        {renderContent()}
+      </main>
+    </div>
   );
 };
-export default ClientList;
+
+export default App;
