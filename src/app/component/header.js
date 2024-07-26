@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image'
 import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, makeStyles } from '@material-ui/core';
 import { AccountCircle, Person, Settings } from '@material-ui/icons';
 
@@ -14,9 +15,14 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     textAlign: 'center',
   },
-  logo: {
-    marginRight: theme.spacing(2),
-  },
+ logoContainer:{
+  marginRight: theme.spacing(2),
+  display: 'flex',
+  alignItems: 'center',
+ },
+ logo:{
+  display: 'block',
+ },
 }));
 
 const Header = () => {
@@ -34,7 +40,9 @@ const Header = () => {
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
-        <img src="/favicon.ico" alt="Logo" className={classes.logo} />
+        <div className={classes.logoContainer}>
+       <Image src="/favicon.ico" alt="Logo" width={40} height={40} className={classes.logo}/>
+        </div>          
         <Typography variant="h6" className={classes.title}>
           Application
         </Typography>

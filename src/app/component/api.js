@@ -20,13 +20,12 @@ const useStyles = makeStyles((theme) => ({
   },
   addButton: {
     alignSelf: 'felx-end',
-  },
-  headerContainer: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
   },
+ 
 }));
 
 const App = () => {
@@ -112,7 +111,7 @@ const App = () => {
               startIcon={<Add />}
               onClick={() => setOpenDialog(true)}
             >
-              Add Client
+              Add New Client
             </Button>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="simple table">
